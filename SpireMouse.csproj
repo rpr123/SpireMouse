@@ -1,0 +1,28 @@
+<Project Sdk="Godot.NET.Sdk/4.5.1">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>SpireMouse</AssemblyName>
+    <RootNamespace>SpireMouse</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DefineConstants Condition="'$(Verify)' == 'true'">$(DefineConstants);VERIFY</DefineConstants>
+    <Sts2InstallDir Condition="'$(Sts2InstallDir)' == ''">$(STS2_INSTALL_DIR)</Sts2InstallDir>
+    <RuntimeDir>$(Sts2InstallDir)\data_sts2_windows_x86_64</RuntimeDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="src\**\*.cs" Exclude="src\Speed\Main.cs;src\Speed\Const.cs;src\Speed\Data\**;src\Speed\Settings\**;src\Speed\Patches\SettingsScreenPatch.cs" />
+    <Compile Include="tests\*.cs" Condition="'$(Verify)' == 'true'" />
+    <Reference Include="sts2" HintPath="$(RuntimeDir)\sts2.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="$(RuntimeDir)\0Harmony.dll" Private="false" />
+    <Reference Include="Steamworks.NET" HintPath="$(RuntimeDir)\Steamworks.NET.dll" Private="false" />
+    <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="all" />
+    <Publicize Include="sts2" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
+    <Content Include="SpireMouse.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Target Name="ValidateGameReferences" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(RuntimeDir)\sts2.dll')"
+           Text="Set STS2_INSTALL_DIR or pass -p:Sts2InstallDir to your installed Slay the Spire 2 directory. Game DLLs are not included in this repository." />
+  </Target>
+</Project>

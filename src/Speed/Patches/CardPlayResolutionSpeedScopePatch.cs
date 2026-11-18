@@ -1,0 +1,41 @@
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models;
+using STS2QuickAnimationMode.Utils;
+using SpireMouse.SpeedPatching;
+
+namespace STS2QuickAnimationMode.Patches
+{
+    public class CardPlayResolutionSpeedScopePatch : IPatchMethod
+    {
+        public static string PatchId => "safe_speed_card_play_resolution";
+        public static string Description => "Accelerate safe card play resolution after a card has been committed";
+
+        public static ModPatchTarget[] GetTargets()
+        {
+            return
+            [
+                new(typeof(CardModel), nameof(CardModel.OnPlayWrapper),
+                    [typeof(PlayerChoiceContext), typeof(Creature), typeof(bool), typeof(ResourceInfo), typeof(bool)]),
+            ];
+        }
+
+        public static void Prefix(out int __state)
+        {
+            __state = CardResolutionSpeed.Enter();
+        }
+
+        public static void Postfix(ref Task __result, int __state)
+        {
+            CardResolutionSpeed.Restore(__state);
+            __result = SpeedManager.TrackAsync(__result, SafeSpeedReason.CardPlayResolution);
+        }
+
+        public static Exception? Finalizer(Exception? __exception, int __state)
+        {
+            CardResolutionSpeed.Restore(__state);
+            return __exception;
+        }
+    }
+}
