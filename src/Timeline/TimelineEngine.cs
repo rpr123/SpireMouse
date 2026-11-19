@@ -182,6 +182,20 @@ internal static partial class TimelineEngine
         ulong deadline = Time.GetTicksMsec() + 45000;
         while (!condition()) { if (Time.GetTicksMsec() > deadline) throw new TimeoutException("행동 재생 대기 시간 초과"); await Frames(); }
     }
+    private static async Task DismissCardChoice()
+    {
+        if (!ChoiceVisible) return;
+        NPlayerHand.Instance?._selectionCompletionSource?.TrySetResult(Array.Empty<MegaCrit.Sts2.Core.Models.CardModel>());
+        var selector = NOverlayStack.Instance?.Peek();
+        if (selector is MegaCrit.Sts2.Core.Nodes.Screens.CardSelection.NCardGridSelectionScreen grid)
+        {
+            grid._completionSource.TrySetResult(Array.Empty<MegaCrit.Sts2.Core.Models.CardModel>());
+            if (NOverlayStack.Instance?.Peek() == grid) NOverlayStack.Instance.Remove(grid);
+        }
+        else if (selector is MegaCrit.Sts2.Core.Nodes.Screens.CardSelection.NChooseACardSelectionScreen choose)
+            choose._completionSource.TrySetResult(Array.Empty<MegaCrit.Sts2.Core.Models.CardModel>());
+        await Frames(3);
+    }
     private static async Task Restore(Point target, int index, bool restart)
     {
         var timer = System.Diagnostics.Stopwatch.StartNew();
@@ -204,19 +218,7 @@ internal static partial class TimelineEngine
                 recovery = new(Journal.Count > (Cursor >= 0 ? Points[Cursor].Events : 0) && _dirty
                     ? Journal.Count : Cursor >= 0 ? Points[Cursor].Events : 0,
                     ChoiceVisible, "복원 전", Fingerprint());
-            if (ChoiceVisible)
-            {
-                NPlayerHand.Instance?._selectionCompletionSource?.TrySetResult(Array.Empty<MegaCrit.Sts2.Core.Models.CardModel>());
-                var selector = NOverlayStack.Instance?.Peek();
-                if (selector is MegaCrit.Sts2.Core.Nodes.Screens.CardSelection.NCardGridSelectionScreen grid)
-                {
-                    grid._completionSource.TrySetResult(Array.Empty<MegaCrit.Sts2.Core.Models.CardModel>());
-                    if (NOverlayStack.Instance?.Peek() == grid) NOverlayStack.Instance.Remove(grid);
-                }
-                else if (selector is MegaCrit.Sts2.Core.Nodes.Screens.CardSelection.NChooseACardSelectionScreen choose)
-                    choose._completionSource.TrySetResult(Array.Empty<MegaCrit.Sts2.Core.Models.CardModel>());
-                await Frames(3);
-            }
+            await DismissCardChoice();
             await Wait(() => CombatManager.Instance.IsOverOrEnding || !ReferenceEquals(originalCombat, CombatManager.Instance.DebugOnlyGetState())
                 || (PlayerTurnReady && !RunManager.Instance.ActionExecutor.IsRunning && RunManager.Instance.ActionQueueSet.IsEmpty));
             // The last action can finish combat while navigation waits for it.

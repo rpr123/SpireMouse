@@ -36,8 +36,18 @@ internal static partial class RuntimeVerification
             if (card is TrueGrit) card.UpgradeInternal();
             await CardPileCmd.Add(card, PileType.Deck, skipVisuals: true);
         }
+        // A later room inherits these counters from earlier choices and rewards.
+        // The room-entry save alone does not carry the replay IDs.
+        var manager = RunManager.Instance;
+        manager.PlayerChoiceSynchronizer.FastForwardChoiceIds([7u]);
+        manager.RewardsSetSynchronizer.FastForwardRewardIds([11]);
+        manager.ActionQueueSet.FastForwardNextActionId(40u);
+        manager.ActionQueueSynchronizer.FastForwardHookId(20u);
         await RunManager.Instance.EnterMapCoord(run.Map!.GetAllMapPoints().First(p => p.PointType == MapPointType.Monster).coord);
         await Until(() => TimelineEngine.Settled && TimelineEngine.Points.Count == 1, "restart history native opening");
+        var entry = manager.CombatReplayWriter._replay!;
+        Check(entry.choiceIds.Any(id => id >= 7u) && entry.rewardIds.Any(id => id >= 11),
+            "combat replay contains IDs inherited from earlier rooms");
         string initial = State();
         await RestartHistoryPlayDefend();
         int actionIndex = TimelineEngine.Cursor;
@@ -49,6 +59,9 @@ internal static partial class RuntimeVerification
             "restart appends one navigable checkpoint instead of clearing history");
         await RestartHistoryNavigate(false, afterDefend, "undo restart restores previous action");
         await RestartHistoryNavigate(true, initial, "redo restart restores initial state");
+        Check(manager.PlayerChoiceSynchronizer.ChoiceIds.SequenceEqual(entry.choiceIds)
+            && manager.RewardsSetSynchronizer.GetNextRewardIds().SequenceEqual(entry.rewardIds),
+            "restart restores the entry choice and reward counters");
         await RestartHistoryNavigate(false, afterDefend, "restart can be undone repeatedly");
         await RestartHistoryNavigate(false, initial, "undo continues through history before restart");
         await RestartHistoryNavigate(true, afterDefend, "redo continues through earlier actions");
@@ -141,6 +154,7 @@ internal static partial class RuntimeVerification
     {
         Check(redo ? TimelineEngine.HandleRedoKey() : TimelineEngine.HandleUndoKey(), label + " accepted");
         await TimelineEngine.NavigationTask!;
+        await Until(() => !RestartPresentation.IsActive, label + " reveal finishes");
         await Frames(5);
         Check(TimelineEngine.Status == "" && State() == expected, label);
         Check(CombatManager.Instance.DebugOnlyCurrentTurnLoopTask?.IsFaulted == false, label + " keeps turn loop alive");

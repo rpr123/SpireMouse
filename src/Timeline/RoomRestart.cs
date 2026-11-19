@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Multiplayer;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Multiplayer.Game.Lobby;
 using MegaCrit.Sts2.Core.Multiplayer.Game.PeerInput;
+using MegaCrit.Sts2.Core.Multiplayer.Replay;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
@@ -22,7 +23,7 @@ internal static partial class TimelineEngine
         return true;
     }
 
-    private static async Task ReloadSavedRoom(SerializableRun? combatEntry = null)
+    private static async Task ReloadSavedRoom()
     {
         IsNavigationInProgress = true;
         Status = "현재 층 재시작 중…";
@@ -38,20 +39,16 @@ internal static partial class TimelineEngine
         try
         {
             if (SaveManager.Instance.CurrentRunSaveTask is { } saving) await saving;
-            var save = combatEntry;
-            if (save == null)
-            {
-                var result = SaveManager.Instance.LoadRunSave();
-                if (!result.Success || result.SaveData == null) throw new InvalidOperationException("현재 진행 저장을 읽을 수 없습니다.");
-                save = result.SaveData;
-            }
+            var result = SaveManager.Instance.LoadRunSave();
+            if (!result.Success || result.SaveData == null) throw new InvalidOperationException("현재 진행 저장을 읽을 수 없습니다.");
+            var save = result.SaveData;
             var state = ValidateRestartState(save);
             // Use the latest native room-entry checkpoint, including completed
             // room metadata. Do not create a new run or discard earned rewards.
             _entry = null; _start = null; Points.Clear(); Journal.Clear(); Cursor = -1;
             _dirty = false; _choiceWasVisible = false; Reserved.Clear();
             replaced = true;
-            await LoadNativeRoom(save, combatEntry != null, state);
+            await LoadNativeRoom(save, preparedState: state);
             success = true;
             Status = "";
         }
@@ -79,7 +76,7 @@ internal static partial class TimelineEngine
         return state;
     }
 
-    private static async Task LoadNativeRoom(SerializableRun save, bool combat, RunState? preparedState = null)
+    private static async Task LoadNativeRoom(SerializableRun save, RunState? preparedState = null, CombatReplay? replay = null)
     {
         var manager = RunManager.Instance;
         if (SaveManager.Instance.CurrentRunSaveTask is { } saving) await saving;
@@ -92,9 +89,18 @@ internal static partial class TimelineEngine
             save.StartTime, save.RunTime, save.WinTime, save.NumReloads);
         manager.InitializeRunLobby(net, state, [new RunLobbyPlayer { id = net.NetId, isModded = true }]);
         manager.InitializeSavedRun(save);
-        await NGame.Instance!.LoadRun(state, combat ? null : save.PreFinishedRoom);
+        if (replay != null)
+        {
+            // The save restores the run. The replay header also records the
+            // counters inherited from previous rooms, before any combat hooks run.
+            manager.PlayerChoiceSynchronizer.FastForwardChoiceIds(replay.choiceIds);
+            manager.RewardsSetSynchronizer.FastForwardRewardIds(replay.rewardIds);
+            manager.ActionQueueSet.FastForwardNextActionId(replay.nextActionId);
+            manager.ActionQueueSynchronizer.FastForwardHookId(replay.nextHookId);
+        }
+        await NGame.Instance!.LoadRun(state, replay != null ? null : save.PreFinishedRoom);
 #if VERIFY
-        if (combat && DiagnosticRoomLoader != null) await DiagnosticRoomLoader();
+        if (replay != null && DiagnosticRoomLoader != null) await DiagnosticRoomLoader();
 #endif
     }
 }

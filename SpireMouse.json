@@ -4,7 +4,7 @@
   "name": "Spire Mouse — 올인원",
   "author": "Spire Mouse contributors; speed component by OLC",
   "description": "우클릭 카드·대상 선택, 변경 가능한 마우스 단축키, 배속, 되돌리기와 층 재시작. Settings → Spire Mouse.\n\nRight-click card play and targeting, customizable mouse shortcuts, adjustable game speed, Undo/Redo, and floor restart. Settings → Spire Mouse.",
-  "version": "2.0.0-beta.19",
+  "version": "2.0.0-beta.20",
   "has_pck": false,
   "has_dll": true,
   "affects_gameplay": false,

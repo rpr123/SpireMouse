@@ -43,9 +43,20 @@ internal static partial class TimelineEngine
             AddPoint(ChoiceVisible, ChoiceVisible ? "카드 선택" : _nextLabel);
             recovery = Points[Cursor];
             originalCursor = Cursor;
+            if (ChoiceVisible)
+            {
+                // Finish the old choice continuation while its player and
+                // synchronizer still belong to the live run.
+                await DismissCardChoice();
+                await Wait(() => Settled || CombatManager.Instance.IsOverOrEnding
+                    || !ReferenceEquals(originalCombat, CombatManager.Instance.DebugOnlyGetState()));
+                if (CombatManager.Instance.IsOverOrEnding || !ReferenceEquals(originalCombat, CombatManager.Instance.DebugOnlyGetState()))
+                { Status = ""; return; }
+            }
             DiscardObjectSnapshots();
             replaced = true;
-            await LoadNativeRoom(Decode<CombatReplay>(_entry!).serializableRun, true);
+            var entry = Decode<CombatReplay>(_entry!);
+            await LoadNativeRoom(entry.serializableRun, replay: entry);
             // Reveal now so the native opening draw remains visible at 1x.
             presentation?.Reveal(); presentation = null;
             _segment = new();
@@ -86,7 +97,8 @@ internal static partial class TimelineEngine
         var events = target.Segment.Events.Take(target.Events).Select(Decode<CombatReplayEvent>).ToArray();
         // Replay is bounded to the chosen checkpoint, never its retained redo tail.
         DiscardObjectSnapshots();
-        await LoadNativeRoom(Decode<CombatReplay>(_entry!).serializableRun, true);
+        var entry = Decode<CombatReplay>(_entry!);
+        await LoadNativeRoom(entry.serializableRun, replay: entry);
         _segment = target.Segment;
         ReplayChoices.Clear(); Reserved.Clear();
         await Wait(() => Settled);
