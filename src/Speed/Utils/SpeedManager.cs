@@ -252,12 +252,22 @@ namespace STS2QuickAnimationMode.Utils
             ApplyReplaySpeed();
         }
 
+        private static float _replayMultiplier = 8f;
+
+        // A covered history rebuild has no visible presentation to pace.
+        public static void SetRebuildBoost(bool enabled)
+        {
+            _replayMultiplier = enabled ? RebuildMultiplier : 8f;
+            if (_restoreDepth > 0) ApplyReplaySpeed();
+        }
+        public static float RebuildMultiplier = 32f;
+
         private static void ApplyReplaySpeed()
         {
             // Only pending-choice continuations need to run during navigation.
             // This temporary rate never changes the user's saved settings.
-            EffectiveMultiplier = 8f;
-            WriteTimeScale(8f, 8f);
+            EffectiveMultiplier = _replayMultiplier;
+            WriteTimeScale(_replayMultiplier, _replayMultiplier);
         }
 
         public static void EndTimelineRestore()

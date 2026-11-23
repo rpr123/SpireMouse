@@ -46,6 +46,12 @@ internal static partial class RuntimeVerification
                 File.WriteAllText(Path.Combine(DirectoryPath, "results.json"), JsonSerializer.Serialize(new { status = "passed", suite = "restart-history", checks = Results }));
                 return;
             }
+            if (System.Environment.GetEnvironmentVariable("SPIRE_MOUSE_VERIFY_SUITE") == "restart-quiet")
+            {
+                await VerifyRestartQuiet();
+                File.WriteAllText(Path.Combine(DirectoryPath, "results.json"), JsonSerializer.Serialize(new { status = "passed", suite = "restart-quiet", checks = Results }));
+                return;
+            }
             if (System.Environment.GetEnvironmentVariable("SPIRE_MOUSE_VERIFY_SUITE") == "restart-fool")
             {
                 await VerifyFoolRestartHistory();

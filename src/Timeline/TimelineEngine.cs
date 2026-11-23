@@ -211,9 +211,10 @@ internal static partial class TimelineEngine
         try
         {
             
-            // A room reload invalidates every object-backed snapshot. Only a
-            // serialized entry plus recorded input can cross that boundary.
-            rebuilding = target.Segment != _segment || (target.Snapshot == null && target.Anchor?.Snapshot == null);
+            // A room reload discards every object-backed snapshot, so any snapshot that
+            // still exists belongs to the live models, whichever segment recorded it.
+            // Only points without one need the serialized entry plus recorded input.
+            rebuilding = target.Snapshot == null && target.Anchor?.Snapshot == null;
             if (rebuilding && ChoiceVisible)
                 recovery = new(Journal.Count > (Cursor >= 0 ? Points[Cursor].Events : 0) && _dirty
                     ? Journal.Count : Cursor >= 0 ? Points[Cursor].Events : 0,
@@ -241,6 +242,7 @@ internal static partial class TimelineEngine
                 if (anchor.State != null && !Fingerprint().SequenceEqual(anchor.State))
                     throw new InvalidOperationException("Restored checkpoint does not match its recorded model.");
             });
+            _segment = target.Segment;
             var events = Journal.Skip(anchor.Events).Take(target.Events - anchor.Events).Select(Decode<CombatReplayEvent>).ToArray();
             ReplayChoices.Clear(); Reserved.Clear();
             foreach (var e in events.Where(e => e.eventType == CombatReplayEventType.PlayerChoice))

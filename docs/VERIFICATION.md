@@ -14,6 +14,10 @@ The first four suites passed before the small final melody UI fix. The focused m
 
 When preparing this public repository, production source and test files were copied without changing their contents. Only build configuration and scripts were made portable. A production compilation is checked separately; no additional actual-game suites are required just to publish the source.
 
+## beta.21
+
+The restart-history change in beta.21 (sound suppression, in-place rebuild, snapshot reuse across segments, faster covered replay) was run on 2026-11-23 against the same game version and mod set: `restart-quiet` 46, `restart-history` 98, `restart-fool` 26, `native-restart` 10, `fool-melody` 57 and `combat` 183 checks passed. `restart-quiet` measures what is perceptible while history crosses a restart: cover frames compared pixel-wise, one-shot sounds reaching the audio engine, replayed inputs outside the cover, and timing for a short and a five-turn combat.
+
 ## Run an opt-in suite
 
 Install Spire Mouse first, start Steam, and close the game. Pass the exact DLL of the selected installed mod; the script replaces it temporarily and restores its backup in `finally` after the verification process exits.
