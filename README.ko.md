@@ -8,7 +8,7 @@
 
 ## 설치와 조작
 
-창작마당에서 구독한 뒤 게임의 모드 메뉴에서 Spire Mouse를 활성화하세요. 필수 선행 모드는 없습니다. Windows의 게임 v0.113.1 public-beta에서 동작을 확인했습니다. [Steam 창작마당](https://steamcommunity.com/sharedfiles/filedetails/?id=3808397695&l=koreana)
+창작마당에서 구독한 뒤 게임의 모드 메뉴에서 Spire Mouse를 활성화하세요. 필수 선행 모드는 없습니다. Windows의 게임 v0.111.1(정식판)과 v0.113.1(public-beta)에서 동작을 확인했습니다. [Steam 창작마당](https://steamcommunity.com/sharedfiles/filedetails/?id=3808397695&l=koreana)
 
 | 기본 입력 | 동작 |
 |---|---|

@@ -18,6 +18,12 @@ When preparing this public repository, production source and test files were cop
 
 The restart-history change in beta.21 (sound suppression, in-place rebuild, snapshot reuse across segments, faster covered replay) was run on 2026-11-23 against the same game version and mod set: `restart-quiet` 46, `restart-history` 98, `restart-fool` 26, `native-restart` 10, `fool-melody` 57 and `combat` 183 checks passed. `restart-quiet` measures what is perceptible while history crosses a restart: cover frames compared pixel-wise, one-shot sounds reaching the audio engine, replayed inputs outside the cover, and timing for a short and a five-turn combat.
 
+## beta.22: stable branch (v0.111.1)
+
+One DLL, built against v0.113, serves both branches. `src/GameCompat.cs` reaches members that exist on only one branch by reflection; Fool arrow code runs only when the arrow types exist. A metadata check of the production DLL against the stable `sts2.dll` found every referenced type and member except those inside `ArrowPresentation`, which stable never calls.
+
+Run on 2026-11-24 against v0.111.1 with `verify.ps1 -StableGame` (the verifier is compiled against the stable game, without The Fool and the v0.113-only game modes): `combat` 183, `restart-history` 98, `restart-quiet` 46, `native-restart` 10, `treasure` 22, `menu` 5, `reattach` 35, `osty-health` 37, `animation` 68 and `gardener` 81 checks passed. Stable's Neow offer did not include a card choice, so the treasure suite's ancient-offer card-choice check did not run there. The same day on v0.113.1: `combat` 183, `restart-history` 98, `restart-quiet` 46, `restart-fool` 26, `fool-melody` 57, `native-restart` 10, `treasure` 23, `reattach` 35, `osty-health` 37, `menu` 5, `animation` 68 and `gardener` 81.
+
 ## Run an opt-in suite
 
 Install Spire Mouse first, start Steam, and close the game. Pass the exact DLL of the selected installed mod; the script replaces it temporarily and restores its backup in `finally` after the verification process exits.

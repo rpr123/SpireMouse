@@ -76,7 +76,7 @@ internal static partial class TimelineEngine
     }
     internal static bool Singleplayer => RunManager.Instance.NetService?.Type == NetGameType.Singleplayer;
     internal static bool ChoiceVisible => NPlayerHand.Instance?.IsInCardSelection == true
-        || NOverlayStack.Instance?.Peek() is MegaCrit.Sts2.Core.Nodes.Screens.CardSelection.ICardSelectionScreen;
+        || GameCompat.IsCardSelectionScreen(NOverlayStack.Instance?.Peek());
     private static bool PlayerTurnReady => CombatManager.Instance.DebugOnlyGetState()?.CurrentSide == MegaCrit.Sts2.Core.Combat.CombatSide.Player
         && !CombatManager.Instance.IsEnemyTurnStarted
         && !CombatManager.Instance.EndingPlayerTurnPhaseOne && !CombatManager.Instance.EndingPlayerTurnPhaseTwo

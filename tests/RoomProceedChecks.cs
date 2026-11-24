@@ -61,7 +61,7 @@ internal static partial class RuntimeVerification
         Check(!ev._event.IsFinished && !NMapScreen.Instance!.IsOpen, "blank right click does not choose event option");
         var eat = Descendants(ev.Layout!).OfType<NEventOptionButton>().OrderBy(b => b.Index).First();
         await Click(Center(eat), MouseButton.Left);
-        await Until(() => NOverlayStack.Instance!.Peek() is ICardSelectionScreen, "event upgrade selector opened");
+        await Until(() => GameCompat.IsCardSelectionScreen(NOverlayStack.Instance!.Peek()), "event upgrade selector opened");
         await Click(blank, MouseButton.Right);
         Check(!NMapScreen.Instance!.IsOpen && !ev._event.IsFinished, "incomplete event selector not skipped");
         var selector = (Node)NOverlayStack.Instance!.Peek()!;
@@ -89,7 +89,7 @@ internal static partial class RuntimeVerification
         // Some offers (e.g. a card removal) ask for a card first.
         for (int i = 0; i < 900 && !ev._event.IsFinished; i++)
         {
-            if (NOverlayStack.Instance!.Peek() is ICardSelectionScreen && NOverlayStack.Instance.Peek() is Node choice)
+            if (GameCompat.IsCardSelectionScreen(NOverlayStack.Instance!.Peek()) && NOverlayStack.Instance.Peek() is Node choice)
             {
                 await Frames(40);
                 await Click(blank, MouseButton.Right);

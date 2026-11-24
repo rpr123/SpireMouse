@@ -202,8 +202,9 @@ internal static class MouseInput
             if (node is NClickableControl or BaseButton or NCreature or NCardHolder) return false;
         var hand = NPlayerHand.Instance;
         if (hand?.IsInCardSelection == true && hovered == hand._selectModeBackstop) return true;
-        if (NOverlayStack.Instance?.Peek() is ICardSelectionScreen or NRewardsScreen { IsComplete: true } or NCrystalSphereScreen
-            && NOverlayStack.Instance.Peek() is Node overlay)
+        var top = NOverlayStack.Instance?.Peek();
+        if ((GameCompat.IsCardSelectionScreen(top) || top is NRewardsScreen { IsComplete: true } or NCrystalSphereScreen)
+            && top is Node overlay)
             return hovered == overlay || (hovered != null && overlay.IsAncestorOf(hovered));
         if (ActiveNonCombatRoom() is { } room)
         {
@@ -237,7 +238,7 @@ internal static class MouseInput
         // Treasure's enabled button can mean Skip while a relic is still available.
         // Only dispatch Proceed after native relic picking has fully completed.
         if (treasure != null && (overlay != null || !ActiveScreenContext.Instance.IsCurrent(treasure)
-            || treasure._proceedButtonState != NTreasureRoom.ProceedButtonState.Proceed || treasure._isRelicCollectionOpen
+            || !GameCompat.TreasureProceedReady(treasure) || treasure._isRelicCollectionOpen
             || !treasure._relicCollection.RelicPickingFinished().IsCompletedSuccessfully
             || treasure.ProceedButton.IsSkip)) return false;
         var room = ActiveNonCombatRoom();
@@ -274,7 +275,7 @@ internal static class MouseInput
             ConfirmCardSelection(hand._selectModeConfirmButton);
             return true;
         }
-        if (NOverlayStack.Instance?.Peek() is ICardSelectionScreen && NOverlayStack.Instance.Peek() is Node overlay)
+        if (GameCompat.IsCardSelectionScreen(NOverlayStack.Instance?.Peek()) && NOverlayStack.Instance!.Peek() is Node overlay)
         {
             _lastEmptyClick = 0;
             ConfirmFirst(overlay);
@@ -323,7 +324,7 @@ internal static class MouseInput
             var overlay = NOverlayStack.Instance?.Peek();
             bool isSelectionConfirm = hand?.IsInCardSelection == true
                 && button == hand._selectModeConfirmButton;
-            isSelectionConfirm |= overlay is ICardSelectionScreen && overlay is Node overlayNode
+            isSelectionConfirm |= GameCompat.IsCardSelectionScreen(overlay) && overlay is Node overlayNode
                 && overlayNode.IsAncestorOf(button);
             if (!isSelectionConfirm || !button.IsEnabled || !button.IsVisibleInTree()
                 || !button.CanProcess()) return false;
@@ -337,7 +338,7 @@ internal static class MouseInput
     {
         if (!holder.IsVisibleInTree() || !holder._isClickable || holder.CardNode == null || TimelineEngine.IsNavigationInProgress) return false;
         var hand = NPlayerHand.Instance;
-        if (hand?.IsInCardSelection == true || NOverlayStack.Instance?.Peek() is ICardSelectionScreen)
+        if (hand?.IsInCardSelection == true || GameCompat.IsCardSelectionScreen(NOverlayStack.Instance?.Peek()))
         {
             // Preserve the game's selector limits, disabled cards and confirmation behavior.
             if (holder is NHandCardHolder) holder.EmitSignal(NHandCardHolder.SignalName.HolderMouseClicked, holder);

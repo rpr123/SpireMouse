@@ -146,7 +146,7 @@ namespace STS2QuickAnimationMode.Patches
             tween.TweenProperty(icon, "scale", Vector2.One, 0.5).From(Vector2.One * 0.1f)
                 .SetEase(Tween.EaseType.Out)
                 .SetTrans(Tween.TransitionType.Back);
-            await tween.AwaitFinished(column);
+            await SpireMouse.GameCompat.AwaitTween(tween, column);
         }
 
         private static async Task SpawnNameAndYearTracked(NEraColumn column, MegaLabel name, MegaLabel year)
@@ -170,7 +170,7 @@ namespace STS2QuickAnimationMode.Patches
                 tween.TweenProperty(year, "position:y", 20f, 1.0).SetDelay(0.5).From(0f)
                     .SetEase(Tween.EaseType.Out)
                     .SetTrans(Tween.TransitionType.Cubic);
-                await tween.AwaitFinished(column);
+                await SpireMouse.GameCompat.AwaitTween(tween, column);
             }
 
             await Task.Delay(500);
@@ -194,7 +194,7 @@ namespace STS2QuickAnimationMode.Patches
             tween.TweenProperty(column, "position", targetPosition, 2.0)
                 .SetEase(Tween.EaseType.InOut)
                 .SetTrans(Tween.TransitionType.Cubic);
-            await tween.AwaitFinished(column);
+            await SpireMouse.GameCompat.AwaitTween(tween, column);
         }
     }
 
@@ -215,7 +215,7 @@ namespace STS2QuickAnimationMode.Patches
         private static async Task TrackTweenAsync(NTimelineTutorial tutorial, Tween tween)
         {
             using var scope = SpeedManager.BeginScope(SafeSpeedReason.TimelineAnimation);
-            await tween.AwaitFinished(tutorial);
+            await SpireMouse.GameCompat.AwaitTween(tween, tutorial);
         }
     }
 
@@ -249,7 +249,7 @@ namespace STS2QuickAnimationMode.Patches
         private static async Task TrackTweenAsync(NUnlockInfo unlockInfo, Tween tween)
         {
             using var scope = SpeedManager.BeginScope(SafeSpeedReason.TimelineAnimation);
-            await tween.AwaitFinished(unlockInfo);
+            await SpireMouse.GameCompat.AwaitTween(tween, unlockInfo);
         }
     }
 
@@ -338,7 +338,7 @@ namespace STS2QuickAnimationMode.Patches
         private static async Task TrackTweenAsync(Node owner, Tween tween)
         {
             using var scope = SpeedManager.BeginScope(SafeSpeedReason.TimelineAnimation);
-            await tween.AwaitFinished(owner);
+            await SpireMouse.GameCompat.AwaitTween(tween, owner);
         }
     }
 

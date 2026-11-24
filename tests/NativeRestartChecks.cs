@@ -20,8 +20,7 @@ internal static partial class RuntimeVerification
         SaveManager.Instance.SetFtuesEnabled(false);
         SettingsStore.Current.Speed.AccelerationMode = SpeedAccelerationMode.Off;
         SpeedManager.OnSettingsChanged();
-        var run = await NGame.Instance!.StartNewSingleplayerRun(MegaCrit.Sts2.Core.Entities.Players.Player.CreateForNewRun(ModelDb.Character<Ironclad>(), SaveManager.Instance.GenerateUnlockStateFromProgress(), 1uL), true,
-            [ModelDb.Act<Overgrowth>(), ModelDb.Act<Hive>(), ModelDb.Act<Glory>()], [], "NATIVERESTART", GameMode.Standard, false);
+        var run = await StartTestRun(ModelDb.Character<Ironclad>(), "NATIVERESTART");
         var point = run.Map!.GetAllMapPoints().First(p => p.PointType == MapPointType.Monster);
         await RunManager.Instance.EnterMapCoord(point.coord);
         await Until(() => TimelineEngine.Settled && TimelineEngine.Points.Count == 1, "native restart initial encounter");

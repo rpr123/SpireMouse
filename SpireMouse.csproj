@@ -8,12 +8,17 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <DefineConstants Condition="'$(Verify)' == 'true'">$(DefineConstants);VERIFY</DefineConstants>
+    <!-- Verification against the stable branch (v0.111), which lacks The Fool. -->
+    <DefineConstants Condition="'$(StableGame)' == 'true'">$(DefineConstants);STABLE_GAME</DefineConstants>
+    <StableGameExclude Condition="'$(StableGame)' == 'true'">tests\Fool*.cs;tests\ModeRestartChecks.cs;tests\CharacterMatrixChecks.cs</StableGameExclude>
     <Sts2InstallDir Condition="'$(Sts2InstallDir)' == ''">$(STS2_INSTALL_DIR)</Sts2InstallDir>
     <RuntimeDir>$(Sts2InstallDir)\data_sts2_windows_x86_64</RuntimeDir>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\**\*.cs" Exclude="src\Speed\Main.cs;src\Speed\Const.cs;src\Speed\Data\**;src\Speed\Settings\**;src\Speed\Patches\SettingsScreenPatch.cs" />
-    <Compile Include="tests\*.cs" Condition="'$(Verify)' == 'true'" />
+    <Compile Include="tests\*.cs" Exclude="$(StableGameExclude)" Condition="'$(Verify)' == 'true'" />
+    <Compile Remove="src\Timeline\ArrowPresentation.cs" Condition="'$(StableGame)' == 'true'" />
+    <Compile Include="tests\stable\*.cs" Condition="'$(StableGame)' == 'true'" />
     <Reference Include="sts2" HintPath="$(RuntimeDir)\sts2.dll" Private="false" />
     <Reference Include="0Harmony" HintPath="$(RuntimeDir)\0Harmony.dll" Private="false" />
     <Reference Include="Steamworks.NET" HintPath="$(RuntimeDir)\Steamworks.NET.dll" Private="false" />

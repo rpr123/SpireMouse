@@ -24,8 +24,7 @@ internal static partial class RuntimeVerification
     {
         SaveManager.Instance.SetFtuesEnabled(false);
         var manager = RunManager.Instance;
-        var run = await NGame.Instance!.StartNewSingleplayerRun(MegaCrit.Sts2.Core.Entities.Players.Player.CreateForNewRun(ModelDb.Character<Ironclad>(), SaveManager.Instance.GenerateUnlockStateFromProgress(), 1uL), true,
-            [ModelDb.Act<Overgrowth>(), ModelDb.Act<Hive>(), ModelDb.Act<Glory>()], [], "GARDENERUNDO", GameMode.Standard, false);
+        var run = await StartTestRun(ModelDb.Character<Ironclad>(), "GARDENERUNDO");
         var player = run.Players[0];
         await CardPileCmd.RemoveFromDeck(player.Deck.Cards.ToArray(), false);
         foreach (var model in new CardModel[] { ModelDb.Card<HandOfGreed>(), ModelDb.Card<StrikeIronclad>(), ModelDb.Card<DefendIronclad>(), ModelDb.Card<DefendIronclad>(), ModelDb.Card<DefendIronclad>() })

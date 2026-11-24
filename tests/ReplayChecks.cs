@@ -36,7 +36,11 @@ internal static partial class RuntimeVerification
             SpeedManager.OnSettingsChanged();
             if (System.Environment.GetEnvironmentVariable("SPIRE_MOUSE_VERIFY_SUITE") == "fool-melody")
             {
+#if STABLE_GAME
+                throw new NotSupportedException("This suite needs game v0.113.");
+#else
                 await VerifyFoolMelodies();
+#endif
                 File.WriteAllText(Path.Combine(DirectoryPath, "results.json"), JsonSerializer.Serialize(new { status = "passed", suite = "fool-melody", checks = Results }));
                 return;
             }
@@ -54,7 +58,11 @@ internal static partial class RuntimeVerification
             }
             if (System.Environment.GetEnvironmentVariable("SPIRE_MOUSE_VERIFY_SUITE") == "restart-fool")
             {
+#if STABLE_GAME
+                throw new NotSupportedException("This suite needs game v0.113.");
+#else
                 await VerifyFoolRestartHistory();
+#endif
                 File.WriteAllText(Path.Combine(DirectoryPath, "results.json"), JsonSerializer.Serialize(new { status = "passed", suite = "restart-fool", checks = Results }));
                 return;
             }
@@ -66,7 +74,11 @@ internal static partial class RuntimeVerification
             }
             if (System.Environment.GetEnvironmentVariable("SPIRE_MOUSE_VERIFY_SUITE") is { } matrix && matrix.StartsWith("matrix-"))
             {
+#if STABLE_GAME
+                throw new NotSupportedException("This suite needs game v0.113.");
+#else
                 await VerifyCharacterMatrix(matrix[7..]);
+#endif
                 File.WriteAllText(Path.Combine(DirectoryPath, "results.json"), JsonSerializer.Serialize(new { status = "passed", suite = matrix, checks = Results }));
                 return;
             }
@@ -101,13 +113,21 @@ internal static partial class RuntimeVerification
             }
             if (System.Environment.GetEnvironmentVariable("SPIRE_MOUSE_VERIFY_SUITE") is { } fool && fool.StartsWith("fool-"))
             {
+#if STABLE_GAME
+                throw new NotSupportedException("This suite needs game v0.113.");
+#else
                 await VerifyFoolScenario(fool[5..]);
+#endif
                 File.WriteAllText(Path.Combine(DirectoryPath, "results.json"), JsonSerializer.Serialize(new { status = "passed", suite = fool, checks = Results }));
                 return;
             }
             if (System.Environment.GetEnvironmentVariable("SPIRE_MOUSE_VERIFY_SUITE") is { } modeRestart && modeRestart.StartsWith("mode-restart-"))
             {
+#if STABLE_GAME
+                throw new NotSupportedException("This suite needs game v0.113.");
+#else
                 await VerifyModeRoomRestarts(modeRestart[13..]);
+#endif
                 File.WriteAllText(Path.Combine(DirectoryPath, "results.json"), JsonSerializer.Serialize(new { status = "passed", suite = modeRestart, checks = Results }));
                 return;
             }
@@ -119,7 +139,11 @@ internal static partial class RuntimeVerification
             }
             if (System.Environment.GetEnvironmentVariable("SPIRE_MOUSE_VERIFY_SUITE") == "fool")
             {
+#if STABLE_GAME
+                throw new NotSupportedException("This suite needs game v0.113.");
+#else
                 await VerifyFoolArrows();
+#endif
                 File.WriteAllText(Path.Combine(DirectoryPath, "results.json"), JsonSerializer.Serialize(new { status = "passed", suite = "fool", checks = Results }));
                 return;
             }
@@ -131,8 +155,7 @@ internal static partial class RuntimeVerification
             }
             SaveManager.Instance.SetFtuesEnabled(false);
             var game = NGame.Instance!;
-            var run = await game.StartNewSingleplayerRun(MegaCrit.Sts2.Core.Entities.Players.Player.CreateForNewRun(ModelDb.Character<Ironclad>(), SaveManager.Instance.GenerateUnlockStateFromProgress(), 1uL), true,
-                [ModelDb.Act<Overgrowth>(), ModelDb.Act<Hive>(), ModelDb.Act<Glory>()], [], "MOUSEJOURNAL", GameMode.Standard, false);
+            var run = await StartTestRun(ModelDb.Character<Ironclad>(), "MOUSEJOURNAL");
             var player = run.Players[0];
             // The fixture is entirely in the precombat save, not injected into a
             // live combat. Replaying must derive every later state from inputs.

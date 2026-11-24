@@ -41,6 +41,18 @@ internal static partial class RuntimeVerification
         SaveManager.MockInstanceForTesting(save);
         Directory.CreateDirectory(DirectoryPath);
     }
+    // New singleplayer run with the standard three acts. v0.113 takes a prepared
+    // player and a custom-game flag; the stable branch (v0.111) takes the character.
+    internal static Task<MegaCrit.Sts2.Core.Runs.RunState> StartTestRun(MegaCrit.Sts2.Core.Models.CharacterModel character, string seed)
+    {
+        MegaCrit.Sts2.Core.Models.ActModel[] acts = [ModelDb.Act<Overgrowth>(), ModelDb.Act<Hive>(), ModelDb.Act<Glory>()];
+#if STABLE_GAME
+        return NGame.Instance!.StartNewSingleplayerRun(character, true, acts, [], seed, GameMode.Standard);
+#else
+        return NGame.Instance!.StartNewSingleplayerRun(MegaCrit.Sts2.Core.Entities.Players.Player.CreateForNewRun(character,
+            SaveManager.Instance.GenerateUnlockStateFromProgress(), 1uL), true, acts, [], seed, GameMode.Standard, false);
+#endif
+    }
     internal static void Check(bool ok, string name)
     {
         if (!ok) throw new InvalidOperationException("Verification failed: " + name);

@@ -34,8 +34,7 @@ internal static partial class RuntimeVerification
         SpeedManager.OnSettingsChanged();
         SaveManager.Instance.SetFtuesEnabled(false);
         var manager = RunManager.Instance;
-        var run = await NGame.Instance!.StartNewSingleplayerRun(MegaCrit.Sts2.Core.Entities.Players.Player.CreateForNewRun(ModelDb.Character<Necrobinder>(), SaveManager.Instance.GenerateUnlockStateFromProgress(), 1uL), true,
-            [ModelDb.Act<Overgrowth>(), ModelDb.Act<Hive>(), ModelDb.Act<Glory>()], [], "OSTYHEALTH", GameMode.Standard, false);
+        var run = await StartTestRun(ModelDb.Character<Necrobinder>(), "OSTYHEALTH");
         var player = run.Players[0];
         await CardPileCmd.RemoveFromDeck(player.Deck.Cards.ToArray(), false);
         foreach (var model in new CardModel[] { ModelDb.Card<Bodyguard>(), ModelDb.Card<DefendNecrobinder>(), ModelDb.Card<DefendNecrobinder>(), ModelDb.Card<StrikeNecrobinder>(), ModelDb.Card<Unleash>() })

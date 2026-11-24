@@ -14,8 +14,7 @@ internal static partial class RuntimeVerification
     private static async Task VerifyTreasureProceed()
     {
         SaveManager.Instance.SetFtuesEnabled(false);
-        var run = await NGame.Instance!.StartNewSingleplayerRun(MegaCrit.Sts2.Core.Entities.Players.Player.CreateForNewRun(ModelDb.Character<Ironclad>(), SaveManager.Instance.GenerateUnlockStateFromProgress(), 1uL), true,
-            [ModelDb.Act<Overgrowth>(), ModelDb.Act<Hive>(), ModelDb.Act<Glory>()], [], "MOUSETREASURE", GameMode.Standard, false);
+        var run = await StartTestRun(ModelDb.Character<Ironclad>(), "MOUSETREASURE");
         var coord = run.Map!.GetAllMapPoints().First(p => p.PointType == MapPointType.Treasure).coord;
         await RunManager.Instance.EnterMapCoord(coord);
         await Until(() => !NGame.Instance.Transition.InTransition && NRun.Instance?.TreasureRoom != null, "treasure room entered");
@@ -31,7 +30,11 @@ internal static partial class RuntimeVerification
         await Click(Center(room.ProceedButton), MouseButton.Right);
         Check(room._isRelicCollectionOpen && !NMapScreen.Instance!.IsOpen, "right click does not skip unclaimed relic even when skip enabled");
         int relics = run.Players[0].Relics.Count;
+#if STABLE_GAME
+        await Click(Center(room._relicCollection._holdersInUse[0]), MouseButton.Left);
+#else
         await Click(Center(room._relicCollection.HoldersInUse[0]), MouseButton.Left);
+#endif
         await Until(() => !room._isRelicCollectionOpen && room.ProceedButton.IsEnabled && !room.ProceedButton.IsSkip,
             "treasure claimed and proceed ready");
         await Frames(40);

@@ -99,7 +99,7 @@ internal sealed class CombatSnapshot
         var state = CombatManager.Instance.DebugOnlyGetState()!;
         _presentation.Rebuild(state);
         CombatHud.Refresh(state);
-        ArrowPresentation.Refresh(state);
+        if (GameCompat.HasFoolArrows) ArrowPresentation.Refresh(state);
         var changed = AccessTools.Field(typeof(CombatStateTracker), "CombatStateChanged").GetValue(CombatManager.Instance.StateTracker) as Action<CombatState>;
         changed?.Invoke(state);
     }

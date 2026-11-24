@@ -8,7 +8,7 @@ Right-click to play cards, adjust the game speed, and use your mouse side button
 
 ## Install
 
-Subscribe on the [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3808397695) and enable Spire Mouse in the game's mod menu. No prerequisite mods are required. Tested on Windows with game v0.113.1 public-beta.
+Subscribe on the [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3808397695) and enable Spire Mouse in the game's mod menu. No prerequisite mods are required. Tested on Windows with game v0.111.1 (stable) and v0.113.1 (public-beta).
 
 ## Default controls
 

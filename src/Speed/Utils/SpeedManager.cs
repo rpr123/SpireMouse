@@ -428,7 +428,7 @@ namespace STS2QuickAnimationMode.Utils
                 return true;
 
             return NPlayerHand.Instance?.IsInCardSelection == true
-                   || NOverlayStack.Instance?.Peek() is ICardSelectionScreen
+                   || SpireMouse.GameCompat.IsCardSelectionScreen(NOverlayStack.Instance?.Peek())
                    || NRun.Instance?.GlobalUi?.TargetManager?.IsInSelection == true;
         }
 

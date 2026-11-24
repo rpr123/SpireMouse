@@ -15,7 +15,7 @@ internal sealed class CreatureVisualSnapshot
     private readonly float _defaultScale;
     private readonly float _temporaryScale;
     private readonly float _hue;
-    private readonly bool _interactionAllowed;
+    private readonly object? _interactionAllowed;
     private readonly Dictionary<string, Vector2> _authoredScales = new();
 
     internal CreatureVisualSnapshot(NCreature node)
@@ -30,7 +30,7 @@ internal sealed class CreatureVisualSnapshot
         _temporaryScale = node._tempScale;
         _hue = node.Visuals._hue;
         // Flee and reattach switch targeting off on the view itself (game v0.113).
-        _interactionAllowed = node._interactionAllowed;
+        _interactionAllowed = GameCompat.InteractionAllowedOf(node);
         foreach (var child in PersistentCreatureEffects.Descendants(node.Visuals).OfType<Node2D>())
             if (child.Owner != null && (node.Visuals.FormVfxHolder == null || !node.Visuals.FormVfxHolder.IsAncestorOf(child)))
                 _authoredScales[node.Visuals.GetPathTo(child).ToString()] = child.Scale;
@@ -43,7 +43,7 @@ internal sealed class CreatureVisualSnapshot
         node._shakeTween?.Kill();
         node.Position = _position;
         node._tempScale = _temporaryScale;
-        node._interactionAllowed = _interactionAllowed;
+        GameCompat.RestoreInteractionAllowed(node, _interactionAllowed);
         if (!Mathf.IsEqualApprox(node.Visuals._hue, _hue))
         {
             node.Visuals.SetScaleAndHue(_defaultScale, _hue);

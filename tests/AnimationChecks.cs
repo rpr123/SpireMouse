@@ -28,8 +28,7 @@ internal static partial class RuntimeVerification
     private static async Task VerifyAnimationUndo()
     {
         SaveManager.Instance.SetFtuesEnabled(false);
-        var run = await NGame.Instance!.StartNewSingleplayerRun(MegaCrit.Sts2.Core.Entities.Players.Player.CreateForNewRun(ModelDb.Character<Ironclad>(), SaveManager.Instance.GenerateUnlockStateFromProgress(), 1uL), true,
-            [ModelDb.Act<Overgrowth>(), ModelDb.Act<Hive>(), ModelDb.Act<Glory>()], [], "ANIMATIONUNDO", GameMode.Standard, false);
+        var run = await StartTestRun(ModelDb.Character<Ironclad>(), "ANIMATIONUNDO");
         var player = run.Players[0];
         await CardPileCmd.RemoveFromDeck(player.Deck.Cards.ToArray(), false);
         foreach (var model in new CardModel[] { ModelDb.Card<Bludgeon>(), ModelDb.Card<StrikeIronclad>(), ModelDb.Card<DefendIronclad>(), ModelDb.Card<DefendIronclad>(), ModelDb.Card<DefendIronclad>() })

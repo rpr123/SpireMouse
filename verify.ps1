@@ -3,7 +3,9 @@ param(
     [Parameter(Mandatory=$true)][string]$InstalledModDll,
     [string]$GameDirectory = $env:STS2_INSTALL_DIR,
     [string]$Suite = 'combat',
-    [string]$DotnetPath = 'dotnet'
+    [string]$DotnetPath = 'dotnet',
+    # The stable branch (v0.111) lacks The Fool; build the verifier without those suites.
+    [switch]$StableGame
 )
 $ErrorActionPreference = 'Stop'
 if (-not $GameDirectory) { throw 'Pass -GameDirectory or set STS2_INSTALL_DIR.' }
@@ -24,7 +26,7 @@ try {
     . "$PSScriptRoot\source-fingerprint.ps1"
     New-Item -ItemType Directory -Path $taskOutput | Out-Null
     Get-SourceFingerprint | Set-Content "$taskOutput\source.sha256"
-    & $DotnetPath build SpireMouse.csproj -c Release "-p:Sts2InstallDir=$taskGame" -p:Verify=true *> "$taskOutput\build.log"
+    & $DotnetPath build SpireMouse.csproj -c Release "-p:Sts2InstallDir=$taskGame" -p:Verify=true "-p:StableGame=$($StableGame.IsPresent.ToString().ToLower())" *> "$taskOutput\build.log"
     if ($LASTEXITCODE -ne 0) { throw 'Verification build failed; see build.log.' }
     Copy-Item -LiteralPath $taskInstalled -Destination "$taskOutput\previous.dll"
     $taskDllBackedUp = $true

@@ -51,7 +51,11 @@ internal static partial class RuntimeVerification
             var oldViews = room.CreatureNodes.ToArray();
             foreach (var node in oldViews)
             {
+#if STABLE_GAME
+                node.AnimDisableUi();
+#else
                 node.AnimateOutStateDisplay();
+#endif
                 node.AnimShake();
             }
             var timer = System.Diagnostics.Stopwatch.StartNew();

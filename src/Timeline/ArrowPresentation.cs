@@ -20,6 +20,8 @@ internal static class ArrowPresentation
 
     // Call after the creature views were rebuilt: the retired views have already
     // unsubscribed, so only the arrow bar reacts to the status events.
+    // Only call when GameCompat.HasFoolArrows: the stable branch lacks these types.
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
     internal static void Refresh(CombatState state)
     {
         var room = NCombatRoom.Instance!;

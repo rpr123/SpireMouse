@@ -59,9 +59,7 @@ internal static partial class RuntimeVerification
         SaveManager.Instance.SetFtuesEnabled(false);
         SettingsStore.Current.HistoryLimit = 100;
         SettingsStore.Current.IncludeChoiceHistory = true;
-        var run = await NGame.Instance!.StartNewSingleplayerRun(
-            MegaCrit.Sts2.Core.Entities.Players.Player.CreateForNewRun(ModelDb.Character<Ironclad>(), SaveManager.Instance.GenerateUnlockStateFromProgress(), 1uL), true,
-            [ModelDb.Act<Overgrowth>(), ModelDb.Act<Hive>(), ModelDb.Act<Glory>()], [], "RESTARTQUIET", GameMode.Standard, false);
+        var run = await StartTestRun(ModelDb.Character<Ironclad>(), "RESTARTQUIET");
         var player = run.Players[0];
         player.Creature.SetMaxHpInternal(1000); player.Creature.SetCurrentHpInternal(1000);
         await CardPileCmd.RemoveFromDeck(player.Deck.Cards.ToArray(), false);

@@ -204,7 +204,7 @@ namespace STS2QuickAnimationMode.Utils
             if (hand is { InCardPlay: true } || hand?.IsInCardSelection == true)
                 return true;
 
-            if (NOverlayStack.Instance?.Peek() is ICardSelectionScreen
+            if (SpireMouse.GameCompat.IsCardSelectionScreen(NOverlayStack.Instance?.Peek())
                 || NRun.Instance?.GlobalUi?.TargetManager?.IsInSelection == true)
                 return true;
 

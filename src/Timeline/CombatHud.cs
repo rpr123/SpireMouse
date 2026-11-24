@@ -17,9 +17,9 @@ internal static class CombatHud
         // Native HasMelody also finds hidden symbols queued for deletion. If
         // Undo/Redo run in one frame, detach those retired icons before the
         // combat-state notification asks the native UI to recreate melodies.
-        foreach (var symbol in PersistentCreatureEffects.Descendants(room.Ui).OfType<NFoolCombatSymbol>()
-            .Where(symbol => symbol.IsQueuedForDeletion()).ToArray())
-            symbol.GetParent()?.RemoveChild(symbol);
+        if (GameCompat.FoolCombatSymbol is { } symbolType)
+            foreach (var symbol in PersistentCreatureEffects.Descendants(room.Ui).Where(n => symbolType.IsInstanceOfType(n) && n.IsQueuedForDeletion()).ToArray())
+                symbol.GetParent()?.RemoveChild(symbol);
         // Model restoration does not emit PotionProcured/UsedPotionRemoved.
         // Reconcile the belt explicitly so restored potions are visible and usable.
         var belt = MegaCrit.Sts2.Core.Nodes.NRun.Instance!.GlobalUi.TopBar.PotionContainer;
